@@ -51,10 +51,14 @@ class VideoIndexerService:
         logger.info(f"Downloading youtube video: {url}")
         
         ydl_opts = {
-            'format' : 'best[ext=mp4]',
+            'format' : 'best',
             'outtmpl' : output_path,
-            'quite' : True,
-            'override' : True
+            'quite' : False,
+            'no_warnings' : False,
+            'extractor_args': {'youtube': {'player_client': ['android', 'web']}},
+            'http_headers': {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            }
         }
         
         try:
@@ -82,7 +86,7 @@ class VideoIndexerService:
         
         logger.info(f"Uploading the file {video_path} to Azure...")
         
-        # Open the file in binary mode and stream it to Azure
+        # Open the file in read binary mode and stream it to Azure
         with open(video_path,'rb') as video_file:
             files = {'file':video_file}
             response = requests.post(api_url, params=params, files=files)
