@@ -68,16 +68,16 @@ def index_docs():
         logger.error("Please verify your Azure OpenAI deployment Name and Endpoint.")
         return 
     
-    # Initialize the Azure Search vector store
+    # Initialize the Azure Search vector db
     try:
         logger.info("Initializing Azure AI Search Vector Store...")
-        embeddings = AzureOpenAIEmbeddings(
+        vector_store = AzureSearch(
             azure_search_endpoint = os.getenv('AZURE_SEARCH_ENDPOINT'),
             azure_search_key= os.getenv('AZURE_SEARCH_API_KEY'),
             index_name = index_name,
             embedding_function = embeddings.embed_query,
         )
-        logger.info(f"Vector store Initialized for the index : {index_name}")
+        logger.info(f"✓ Vector store initialized for index: {index_name}")
     except Exception as e:
         logger.error(f"Failed to initialze Search: {e}")
         logger.error("Please verify your Azure Search Endpoint API key and Index name.")
@@ -114,7 +114,7 @@ def index_docs():
             
         # upload to Azure
         if all_splits:
-            logger.info(f"Uploading {len(all_splits)} chunks to Azure AI search index '{index_name}'")
+            logger.info(f"Uploading {len(all_splits)} chunks to Azure AI search index '{index_name}'...")
             try:
                 # Azure search accepts bactches automatically 
                 vector_store.add_documents(documents = all_splits)
