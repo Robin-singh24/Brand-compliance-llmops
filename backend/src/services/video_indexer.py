@@ -25,7 +25,7 @@ class VideoIndexerService:
         # Generates the ARM Access Token
         try:
             token_object = self.credential.get_token("https://management.azure.com/.default")
-            return token_object
+            return token_object.token
         except Exception as e:
             logger.error(f"Failed to get Azure Token: {e}")
             raise
@@ -46,7 +46,7 @@ class VideoIndexerService:
         return response.json().get("accessToken")
     
     # Download the Youtube video
-    def download_yt_video(self, url, output_path="temp_video.mp4"):
+    def download_youtube_video(self, url, output_path="temp_video.mp4"):
         '''Downloads the yt video to the local file'''
         logger.info(f"Downloading youtube video: {url}")
         
@@ -120,13 +120,21 @@ class VideoIndexerService:
             
     def extract_data(self, vi_json):
         '''Parses the JSON into state format'''
+        logger.info(f"VI JSON keys: {list(vi_json.keys())}")
+        videos = vi_json.get("videos", [])
+        logger.info(f"Number of videos: {len(videos)}")
+        if videos:
+            insights = videos[0].get("insights", {})
+            logger.info(f"Insights keys: {list(insights.keys())}")
+            logger.info(f"Transcript sample: {insights.get('transcript', [])[:2]}")
+
         transcript_lines = []
         for v in vi_json.get("videos", []):
-            for insights in v.get("insights",{}).get("transcripts",[]):
+            for insights in v.get("insights",{}).get("transcript",[]):
                 transcript_lines.append(insights.get("text"))    
         
         ocr_lines = []
-        for v in vi_json("videos",[]):
+        for v in vi_json.get("videos",[]):
             for insights in v.get("insights",{}).get("ocr",[]):
                 ocr_lines.append(insights.get("text"))
         return {
@@ -137,3 +145,4 @@ class VideoIndexerService:
                 "platform" : "youtube"
             }
         }
+        

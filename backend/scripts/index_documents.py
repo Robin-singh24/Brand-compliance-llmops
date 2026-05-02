@@ -58,7 +58,7 @@ def index_docs():
         logger.info("Initializing Azure OpenAI Embeddings...")
         embeddings = AzureOpenAIEmbeddings(
             azure_deployment= os.getenv('AZURE_OPENAI_EMBEDDING_DEPLOYMENT', 'text-embedding-3-small'),
-            azure_endpoint= os.getenv('AZURE_SEARCH_ENDPOINT'),
+            azure_endpoint= os.getenv('AZURE_OPENAI_ENDPOINT'),
             api_key = os.getenv('AZURE_OPENAI_API_KEY'),
             openai_api_version = os.getenv('AZURE_OPENAI_API_VERSION', '2024-12-01'),
         )
@@ -69,6 +69,7 @@ def index_docs():
         return 
     
     # Initialize the Azure Search vector db
+    index_name = os.getenv('AZURE_SEARCH_INDEX_NAME')
     try:
         logger.info("Initializing Azure AI Search Vector Store...")
         vector_store = AzureSearch(
@@ -112,20 +113,20 @@ def index_docs():
         except Exception as e:
             logger.error(f"Failed to process {pdf_path} : {e}")
             
-        # upload to Azure
-        if all_splits:
-            logger.info(f"Uploading {len(all_splits)} chunks to Azure AI search index '{index_name}'...")
-            try:
-                # Azure search accepts bactches automatically 
-                vector_store.add_documents(documents = all_splits)
-                logger.info("="*60)
-                logger.info(f"Indexing complete! Knowledge base is complete...")
-                logger.info(f"Total chunks indexed : {len(all_splits)}")
-            except Exception as e:
-                logger.error(f"Failed to upload the documents to Azure search : {e}")
-                logger.error("Please check the Azure Search configuration and try again.")
-        else:
-            logger.warning(f"No documents were processed")
+    # upload to Azure
+    if all_splits:
+        logger.info(f"Uploading {len(all_splits)} chunks to Azure AI search index '{index_name}'...")
+        try:
+            # Azure search accepts bactches automatically 
+            vector_store.add_documents(documents = all_splits)
+            logger.info("="*60)
+            logger.info(f"Indexing complete! Knowledge base is complete...")
+            logger.info(f"Total chunks indexed : {len(all_splits)}")
+        except Exception as e:
+            logger.error(f"Failed to upload the documents to Azure search : {e}")
+            logger.error("Please check the Azure Search configuration and try again.")
+    else:
+        logger.warning(f"No documents were processed")
             
 if __name__ == "__main__":
     index_docs()

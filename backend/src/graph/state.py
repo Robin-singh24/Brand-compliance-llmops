@@ -20,7 +20,7 @@ class VideoAuditState(TypedDict):
     # ingestion and extracting data
     local_file_path: Optional[str]
     video_metadata: Optional[Dict[str,Any]]
-    trancsript: Optional[str]
+    transcript: Optional[str]
     ocr_text: List[str]
     
     # analysis results
@@ -28,7 +28,7 @@ class VideoAuditState(TypedDict):
     
     # final deliverables
     final_status: str
-    final_result: str               # probably a MD file
+    final_report: str               # probably a MD file
     
     # system observability
     errors: Annotated[List[str], operator.add]

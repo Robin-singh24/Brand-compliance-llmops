@@ -64,7 +64,7 @@ def index_video_node(state: VideoAuditState) -> Dict[str,Any]:
         return{
             "errors": [str(e)],
             "final_status": "FAIL",
-            "trancript": "",
+            "transcript": "",
             "ocr_text": []
         }
         
@@ -132,18 +132,18 @@ def audio_content_node(state: VideoAuditState) -> Dict[str,Any]:
     Return ONLY a valid JSON object. No preamble, no explanation, no markdown fences.
 
     JSON SCHEMA:
-    {
+    {{
         "compliance_result": [
-            {
+            {{
                 "category": "e.g. Claim Validation, Disclosure, Branding",
                 "severity": "CRITICAL | HIGH | MEDIUM | LOW",
                 "description": "What was said/shown, which rule it violates, and why"
 
-            }
+            }}
         ],
         "status": "PASS | FAIL",
         "final_report": "2-3 sentence summary of overall compliance posture"
-    }
+    }}
 
     SEVERITY DEFINITIONS:
     - CRITICAL — legal or regulatory breach, immediate action required
@@ -171,7 +171,10 @@ def audio_content_node(state: VideoAuditState) -> Dict[str,Any]:
                 TRANSCRIPT: {transcript}
                 ON-SCREEN TEXT(OCR): {ocr_text}
             """
-            
+        
+    logger.info(f"RETRIEVED RULES:\n{retrieved_rules}")
+    logger.info(f"FULL TRANSCRIPT: {transcript}")
+    logger.info(f"OCR TEXT: {ocr_text}")    
     try:
         response = llm.invoke([
             SystemMessage(content=system_prompt),
@@ -180,13 +183,13 @@ def audio_content_node(state: VideoAuditState) -> Dict[str,Any]:
         content = response.content
         
         if "```" in content:
-           content = re.search(r"```(?:json)?(.?)```", content, re.DOTALL).group(1) 
+           content = re.search(r"```(?:json)?(.*?)```", content, re.DOTALL).group(1) 
         
         audit_data = json.loads(content.strip())
         return {
             "compliance_result": audit_data.get("compliance_result",[]),
             "final_status": audit_data.get("status", "FAIL"),
-            "final_report": audit_data.get("final_report", "No report generated") 
+            "final_report": audit_data.get("final_report") or "No report generated" 
         }
     except Exception as e:
         logger.error(f"System error in Auditor node: {str(e)}")

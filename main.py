@@ -14,6 +14,7 @@ import logging
 
 from pprint import pprint
 from dotenv import load_dotenv
+load_dotenv()
 
 from backend.src.graph.workflow import app
 
@@ -48,7 +49,7 @@ def run_cli_simulation():
     # This dictionary contains all the input data for the workflow
     initial_inputs = {
         # The YouTube video to audit
-        "video_url" : "https://www.youtube.com/watch?v=CcfZqA_R7Tc",
+        "video_url" : "https://youtu.be/dT7S75eYhcQ",
         # Shortened video ID for easier tracking (first 8 chars of session ID)
         "video_id" : f"vid_{session_id[:8]}",
         # To store the compliance violations found
@@ -78,7 +79,7 @@ def run_cli_simulation():
         
         # Extract the list of compliance violations
         # Default to empty list if no results
-        results = final_state.get('compliance_results', [])
+        results = final_state.get('compliance_result', [])
         
         if results:
             for issue in results:
@@ -90,11 +91,11 @@ def run_cli_simulation():
             print("No violations found.")
             
         print("\n[FINAL SUMMARY]")
-        print(final_state.get('fnal_report'))
+        print(final_state.get('final_report'))
     
     except Exception as e:
         logger.error(f"Workflow Execution Failed : {str(e)}")
         raise e
     
-if __name__ == "main":
+if __name__ == "__main__":
     run_cli_simulation()
