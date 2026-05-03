@@ -40,7 +40,7 @@ class AuditRequest(BaseModel):
     '''
     Define the base structure of the incoming API requests
     '''
-    video_url = str
+    video_url : str
     
 class ComplianceIssue(BaseModel):
     category: str
@@ -78,8 +78,8 @@ async def audit_video(request: AuditRequest):
             session_id = session_id,
             video_id = final_state.get("video_id"),
             status = final_state.get("final_status","UNKNOWN"),
-            final_report = final_state.get("final_report", "No Report Generated"),
-            compliance_results = final_state.get("compliance_results", [])
+            final_report = final_state.get("final_report") or "No Report Generated",
+            compliance_results = final_state.get("compliance_result", [])
         )
     except Exception as e:
         logger.error(f"Audit failed : {str(e)}")
