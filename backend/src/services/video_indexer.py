@@ -50,6 +50,13 @@ class VideoIndexerService:
         '''Downloads the yt video to the local file'''
         logger.info(f"Downloading youtube video: {url}")
         
+        cookies_path = None
+        cookies_content = os.getenv("YOUTUBE_COOKIES")
+        if cookies_content:
+            cookies_path = "cookies.txt"
+            with open(cookies_path, "w") as f:
+                f.write(cookies_content)
+        
         ydl_opts = {
             'format' : 'best',
             'outtmpl' : output_path,
@@ -60,6 +67,9 @@ class VideoIndexerService:
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
             }
         }
+        
+        if cookies_path:
+            ydl_opts['cookiefile'] = cookies_path
         
         try:
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
