@@ -30,6 +30,13 @@ from backend.src.graph.workflow import app as compliance_graph
 # Configure root logger to INFO level — captures workflow, request, and error logs
 logging.basicConfig(level=logging.INFO)
 
+
+'''debug'''
+logging.getLogger("azure").setLevel(logging.WARNING)
+logging.getLogger("azure.core").setLevel(logging.WARNING)
+logging.getLogger("azure.identity").setLevel(logging.WARNING)
+logging.getLogger("azure.monitor").setLevel(logging.WARNING)
+
 # Module-level logger scoped to the API server for structured log filtering
 logger = logging.getLogger("api-server")
 
