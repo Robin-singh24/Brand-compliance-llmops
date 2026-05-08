@@ -66,13 +66,20 @@ class VideoIndexerService:
         response = requests.get(api_url, headers=headers, params={"id": video_id})
         data = response.json()
 
-        # Get lowest quality mp4 (enough for Azure VI)
-        formats = data.get("formats", {})
+        # Get mp4 URL from formats list
+        formats = data.get("formats", [])
         mp4_url = None
-        for quality in ["360", "240", "480", "720"]:
-            if quality in formats:
-                mp4_url = formats[quality]["url"]
+        for fmt in formats:
+            if fmt.get("mimeType", "").startswith("video/mp4"):
+                mp4_url = fmt.get("url")
                 break
+
+        # Fallback to adaptiveFormats
+        if not mp4_url:
+            for fmt in data.get("adaptiveFormats", []):
+                if fmt.get("mimeType", "").startswith("video/mp4"):
+                    mp4_url = fmt.get("url")
+                    break
 
         if not mp4_url:
             raise Exception(f"No MP4 format available. API response: {data}")
