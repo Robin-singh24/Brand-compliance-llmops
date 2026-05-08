@@ -47,39 +47,43 @@ class VideoIndexerService:
     
     # Download the Youtube video
     def download_youtube_video(self, url, output_path="temp_video.mp4"):
-        '''Downloads the yt video to the local file'''
+        '''Downloads the yt video using RapidAPI YTStream'''
         logger.info(f"Downloading youtube video: {url}")
-        
-        cookies_path = None
-        cookies_content = os.getenv("YOUTUBE_COOKIES")
-        logger.info(f"Cookies loaded: {bool(cookies_content)}")  # debug
-        if cookies_content:
-            cookies_path = "cookies.txt"
-            with open(cookies_path, "w") as f:
-                f.write(cookies_content)
-        
-        ydl_opts = {
-            'format' : 'best',
-            'outtmpl' : output_path,
-            'quite' : False,
-            'no_warnings' : False,
-            'extractor_args': {'youtube': {'player_client': ['web']}},
-            'http_headers': {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-            }
+
+        # Extract video ID from URL
+        if "youtu.be/" in url:
+            video_id = url.split("youtu.be/")[-1].split("?")[0]
+        else:
+            video_id = url.split("v=")[-1].split("&")[0]
+
+        api_url = "https://ytstream-download-youtube-videos.p.rapidapi.com/dl"
+        headers = {
+            "x-rapidapi-key": os.getenv("RAPIDAPI_KEY"),
+            "x-rapidapi-host": "ytstream-download-youtube-videos.p.rapidapi.com"
         }
-        
-        if cookies_path:
-            ydl_opts['cookiefile'] = cookies_path
-        
-        try:
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                ydl.download([url])
-            logger.info("Download complete!!!")
-            return output_path
-        except Exception as e:
-            logger.error(f"Download failed: {str(e)}")  # debug
-            raise Exception(f"Youtube video download failed : {str(e)}")
+
+        response = requests.get(api_url, headers=headers, params={"id": video_id})
+        data = response.json()
+
+        # Get lowest quality mp4 (enough for Azure VI)
+        formats = data.get("formats", {})
+        mp4_url = None
+        for quality in ["360", "240", "480", "720"]:
+            if quality in formats:
+                mp4_url = formats[quality]["url"]
+                break
+
+        if not mp4_url:
+            raise Exception(f"No MP4 format available. API response: {data}")
+
+        # Stream download to file
+        video_response = requests.get(mp4_url, stream=True)
+        with open(output_path, "wb") as f:
+            for chunk in video_response.iter_content(chunk_size=8192):
+                f.write(chunk)
+
+        logger.info("Download complete!!!")
+        return output_path
         
     
     # Upload to downloaded to Azure Video Indexer
