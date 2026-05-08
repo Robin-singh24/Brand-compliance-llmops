@@ -240,8 +240,12 @@ APPLICATIONINSIGHTS_CONNECTION_STRING=
 
 # LangSmith (optional)
 LANGCHAIN_TRACING_V2=true
+LANGCHAIN_ENDPOINT="https://smith.langchain.com"
 LANGCHAIN_API_KEY=
-LANGCHAIN_PROJECT=brand-compliance
+LANGCHAIN_PROJECT=
+LANGCHAIN_TRACING_V2=false
+
+RAPIDAPI_KEY=
 ```
 
 ### 3. Build the knowledge base (one-time)
