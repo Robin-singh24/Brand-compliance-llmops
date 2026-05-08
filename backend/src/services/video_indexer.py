@@ -61,7 +61,8 @@ class VideoIndexerService:
             "x-rapidapi-key": os.getenv("RAPIDAPI_KEY"),
             "x-rapidapi-host": "ytstream-download-youtube-videos.p.rapidapi.com"
         }
-
+        api_key = os.getenv("RAPIDAPI_KEY")
+        logger.info(f"RapidAPI key length: {len(api_key) if api_key else 'NOT SET'}")
         response = requests.get(api_url, headers=headers, params={"id": video_id})
         data = response.json()
 
@@ -75,6 +76,8 @@ class VideoIndexerService:
 
         if not mp4_url:
             raise Exception(f"No MP4 format available. API response: {data}")
+        
+        
 
         # Stream download to file
         video_response = requests.get(mp4_url, stream=True)
