@@ -52,6 +52,7 @@ class VideoIndexerService:
         
         cookies_path = None
         cookies_content = os.getenv("YOUTUBE_COOKIES")
+        logger.info(f"Cookies loaded: {bool(cookies_content)}")  # debug
         if cookies_content:
             cookies_path = "cookies.txt"
             with open(cookies_path, "w") as f:
@@ -77,6 +78,7 @@ class VideoIndexerService:
             logger.info("Download complete!!!")
             return output_path
         except Exception as e:
+            logger.error(f"Download failed: {str(e)}")  # debug
             raise Exception(f"Youtube video download failed : {str(e)}")
         
     
