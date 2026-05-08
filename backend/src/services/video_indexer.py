@@ -58,7 +58,7 @@ class VideoIndexerService:
                 f.write(cookies_content)
         
         ydl_opts = {
-            'format' : '18',
+            'format' : 'best[ext=mp4]/best',
             'outtmpl' : output_path,
             'quite' : False,
             'no_warnings' : False,
