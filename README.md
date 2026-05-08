@@ -61,7 +61,7 @@ Submit a YouTube URL → the pipeline downloads the video, extracts every spoken
 | **Embeddings** | Azure OpenAI `text-embedding-3-small` |
 | **Vector Store / RAG** | Azure AI Search |
 | **Video Intelligence** | Azure Video Indexer (transcript + OCR) |
-| **Video Download** | yt-dlp | RapidAPI YT Video downloader
+| **Video Download** | yt-dlp, RapidAPI YT Video downloader
 | **Blob Storage** | Azure Blob Storage |
 | **Observability** | Azure Monitor OpenTelemetry + LangSmith |
 | **Data Validation** | Pydantic v2 |
