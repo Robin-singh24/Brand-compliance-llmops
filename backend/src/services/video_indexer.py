@@ -58,11 +58,11 @@ class VideoIndexerService:
                 f.write(cookies_content)
         
         ydl_opts = {
-            'format' : 'best',
+            'format' : '18',
             'outtmpl' : output_path,
             'quite' : False,
             'no_warnings' : False,
-            'extractor_args': {'youtube': {'player_client': ['android', 'web']}},
+            'extractor_args': {'youtube': {'player_client': ['web']}},
             'http_headers': {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
             }
